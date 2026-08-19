@@ -1,0 +1,41 @@
+# ===== Python =====
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.eggs/
+build/
+dist/
+*.pem
+
+# 虚拟环境（本地运行用，勿上传）
+.venv/
+.venv-local/
+
+# 运行时抓包 / 临时文件
+.tmp*
+*.log
+npm-debug.log*
+
+# ===== 环境变量与凭据（本地用，勿上传；仅保留 .env.example）=====
+.env
+.env.*.local
+env.local
+# 本地配置（含内网地址/占位，勿上传；用 conf.example.yaml 生成）
+conf.yaml
+
+# ===== 前端（web 下另有独立 .gitignore）=====
+web/node_modules/
+web/.next/
+web/out/
+web/build/
+web/tsconfig.tsbuildinfo
+# 前端骨架备份目录（参考用，非运行所需）
+web/src.skeleton-backup/
+
+# ===== 系统 / 编辑器 =====
+.DS_Store
+.idea/
+.vscode/
+*.swp
+.vercel

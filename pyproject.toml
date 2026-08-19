@@ -1,0 +1,45 @@
+[project]
+name = "mini-deepresearch-ch10"
+version = "0.10.0"
+description = "第10章：研究过程增强（可观测健壮性 + MCP 工具 + RAG 检索）"
+requires-python = ">=3.12"
+dependencies = [
+    "langgraph>=0.3.5",
+    "langchain-openai>=0.3.0",
+    "langchain-core>=0.3.0",
+    "langchain-experimental>=0.3.0",  # 第3章新增：PythonREPL
+    "ddgs>=9.0.0",                    # duckduckgo-search 已改名 ddgs
+    "requests>=2.31.0",               # 第3章新增：JinaClient 爬虫
+    "jinja2>=3.1.0",
+    "python-dotenv>=1.0.0",
+    "pydantic>=2.0.0",
+    "pyyaml>=6.0",
+    "json-repair>=0.7.0",             # 第2章：修复 LLM 输出的脏 JSON
+    "fastapi>=0.110.0",               # 第8章新增：HTTP 服务
+    "uvicorn>=0.27.0",                # 第8章新增：ASGI 服务器
+    "sqlalchemy>=2.0.0",              # 第8章新增：业务表持久化
+    "psycopg[binary]>=3.2.9",                # 第8章起：PG 驱动（psycopg3，免编译）
+    "psycopg-pool>=3.2",                     # 异步连接池（checkpointer）
+    "langgraph-checkpoint-postgres>=2.0.21", # checkpointer 持久化
+    "langchain-mcp-adapters>=0.3.0",
+    "python-docx>=1.2.0",
+    "playwright>=1.61.0",
+]
+
+# 可选增强（默认不装，主流程用 ddgs + Jina markdown 已可跑）：
+#   uv run --extra tavily main.py        # 启用 Tavily 搜索引擎
+#   uv run --extra readability main.py   # 启用爬虫 Readability 增强路径
+#   uv run --extra mcp server.py         # 启用 MCP 工具加载（本章 MCP 增量）
+[project.optional-dependencies]
+tavily = ["tavily-python>=0.5.0"]
+readability = ["markdownify>=0.13.0", "readabilipy>=0.3.0"]
+mcp = ["langchain-mcp-adapters>=0.1.0"]  # 本章 MCP 增量：动态工具加载
+aihub = ["ddddocr>=1.5.0"]  # AIHUB 验证码 OCR（实战/集成测试需要）
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+]
+
+# uv run main.py 时：uv 自动创建 .venv、装依赖、运行脚本
+# 不需要 [build-system]——本教程把每章 code/ 当作脚本集合，不做包构建

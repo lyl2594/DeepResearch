@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>深思 DeepResearch · 多智能体深度研究系统功能演示</title>
+<style>
+  :root{
+    --bg:#0b0f1a; --bg2:#111827; --card:#151d2f; --card2:#1a2338;
+    --line:#25304a; --txt:#e6ecff; --muted:#8b96b5; --accent:#6ea8ff;
+    --accent2:#9d7bff; --green:#34d399; --amber:#fbbf24; --red:#f87171;
+    --cyan:#22d3ee; --radius:14px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--txt);font-family:"PingFang SC","Microsoft YaHei",-apple-system,Segoe UI,Roboto,sans-serif;line-height:1.6}
+  a{color:var(--accent);text-decoration:none}
+  .wrap{max-width:1160px;margin:0 auto;padding:0 20px}
+  /* nav */
+  nav{position:sticky;top:0;z-index:50;background:rgba(11,15,26,.82);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+  .nav-in{display:flex;align-items:center;gap:22px;height:60px}
+  .brand{font-weight:700;font-size:16px;letter-spacing:.3px}
+  .brand span{color:var(--accent)}
+  .nav-links{display:flex;gap:6px;margin-left:auto;flex-wrap:wrap}
+  .nav-links button{background:none;border:none;color:var(--muted);font-size:13px;padding:7px 12px;border-radius:8px;cursor:pointer}
+  .nav-links button:hover{color:var(--txt);background:var(--card2)}
+  .nav-links button.active{color:var(--accent);background:rgba(110,168,255,.12)}
+  /* hero */
+  header.hero{padding:58px 0 34px;text-align:center;
+    background:radial-gradient(800px 360px at 50% -80px,rgba(110,168,255,.22),transparent 70%)}
+  .hero .pill{display:inline-block;font-size:12.5px;color:var(--accent);border:1px solid rgba(110,168,255,.35);padding:6px 14px;border-radius:999px;margin-bottom:18px;background:rgba(110,168,255,.08)}
+  .hero h1{font-size:40px;font-weight:800;letter-spacing:.5px;line-height:1.25}
+  .hero h1 em{font-style:normal;background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .hero p.sub{color:var(--muted);max-width:720px;margin:16px auto 0;font-size:16px}
+  .hero-btns{margin-top:26px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+  .btn{display:inline-flex;align-items:center;gap:8px;padding:11px 20px;border-radius:10px;font-size:14px;cursor:pointer;border:1px solid var(--line);background:var(--card2);color:var(--txt);font-weight:600}
+  .btn:hover{transform:translateY(-1px);border-color:var(--accent)}
+  .btn.primary{background:linear-gradient(90deg,var(--accent),var(--accent2));border:none;color:#fff}
+  /* stat band */
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:34px 0}
+  .stat{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:18px;text-align:center}
+  .stat b{font-size:26px;display:block;background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .stat span{color:var(--muted);font-size:13px}
+  section{padding:56px 0;border-top:1px solid var(--line)}
+  .sec-title{font-size:26px;font-weight:800;margin-bottom:6px}
+  .sec-sub{color:var(--muted);margin-bottom:28px}
+  /* feature grid */
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .fcard{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:20px;transition:.2s}
+  .fcard:hover{border-color:var(--accent);transform:translateY(-3px)}
+  .fcard .ic{font-size:24px;margin-bottom:10px}
+  .fcard h3{font-size:16px;margin-bottom:8px}
+  .fcard p{color:var(--muted);font-size:13.5px}
+  /* pipeline diagram */
+  .pipe{display:flex;align-items:stretch;gap:10px;flex-wrap:wrap;justify-content:center}
+  .node{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;min-width:130px;text-align:center}
+  .node .tag{display:inline-block;font-size:11px;padding:2px 8px;border-radius:6px;margin-bottom:6px;font-weight:700}
+  .node h4{font-size:14px;margin-bottom:4px}
+  .node p{font-size:11.5px;color:var(--muted)}
+  .arrow{display:flex;align-items:center;color:var(--accent);font-weight:700;padding:0 2px}
+  /* demo console */
+  .demo{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+  .demo-top{display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+  .demo-top .dots{display:flex;gap:6px}
+  .demo-top .dots i{width:11px;height:11px;border-radius:50%;display:block}
+  .demo-top input.free{flex:1;min-width:180px;background:var(--bg2);border:1px solid var(--line);border-radius:8px;color:var(--txt);padding:9px 12px;font-size:14px}
+  .demo-body{display:grid;grid-template-columns:300px 1fr;min-height:460px}
+  .pipeline-panel{border-right:1px solid var(--line);padding:16px 14px;background:var(--bg2)}
+  .pstep{display:flex;align-items:center;gap:11px;padding:10px;border-radius:9px;margin-bottom:8px;border:1px solid transparent;color:var(--muted);font-size:13px;transition:.25s}
+  .pstep .dot{width:22px;height:22px;border-radius:50%;background:var(--card2);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:11px;flex:none}
+  .pstep.on{color:var(--txt);border-color:var(--accent);background:rgba(110,168,255,.09)}
+  .pstep.done{color:var(--green);opacity:.9}
+  .pstep.done .dot{background:rgba(52,211,153,.15);border-color:var(--green)}
+  .pstep.usermsg{color:var(--cyan)}
+  .stream-col{padding:18px;display:flex;flex-direction:column;gap:12px;overflow:auto;max-height:560px}
+  .card{background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:13px 15px;font-size:13.5px}
+  .card .hd{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+  .card .hd .who{font-weight:700;font-size:13px}
+  .card .hd .badge{font-size:11px;padding:3px 9px;border-radius:999px;background:rgba(110,168,255,.14);color:var(--accent)}
+  .card pre{font-family:inherit;white-space:pre-wrap;color:var(--muted);font-size:13px}
+  .toolchips{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+  .toolchips .tc{font-size:11px;padding:4px 9px;border-radius:6px;background:var(--card2);border:1px solid var(--line)}
+  .card.streaming .cursor{display:inline-block;width:7px;height:14px;background:var(--accent);vertical-align:middle;animation:blink .9s step-start infinite}
+  @keyframes blink{50%{opacity:0}}
+  .hl-options{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+  .optbtn{padding:7px 13px;border-radius:8px;font-size:12.5px;cursor:pointer;border:1px solid var(--accent);background:rgba(110,168,255,.1);color:var(--accent);font-weight:600}
+  .optbtn:hover{background:var(--accent);color:#fff}
+  .scorebar{height:8px;background:var(--card2);border-radius:99px;overflow:hidden;margin-top:6px}
+  .scorebar i{display:block;height:100%;background:linear-gradient(90deg,var(--green),var(--amber));border-radius:99px;transition:width .5s}
+  table.tbl{width:100%;border-collapse:collapse;font-size:13.5px}
+  table.tbl th,table.tbl td{border:1px solid var(--line);padding:9px 12px;text-align:left}
+  table.tbl th{background:var(--card2);font-weight:700}
+  code.k{background:var(--card2);border:1px solid var(--line);padding:1px 6px;border-radius:6px;font-size:12.5px;color:var(--cyan)}
+  .mgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+  /* answer block */
+  .answer{background:linear-gradient(180deg,var(--bg2),var(--card));border:1px solid var(--line);border-radius:12px;padding:18px}
+  .answer h5{font-size:15px;margin:14px 0 6px;color:var(--accent)}
+  .answer h5:first-child{margin-top:0}
+  .answer ul,.answer ol{margin-left:20px;color:var(--txt)}
+  .answer li{margin:3px 0}
+  blockquote.good{border-left:3px solid var(--green);padding:6px 12px;color:var(--muted);background:rgba(52,211,153,.06);border-radius:0 8px 8px 0;margin:8px 0}
+  .footer{text-align:center;color:var(--muted);padding:44px 0 56px;font-size:13px;border-top:1px solid var(--line)}
+  .tabbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+  .tabbar button{padding:9px 15px;border-radius:9px;font-size:13px;cursor:pointer;border:1px solid var(--line);background:var(--card);color:var(--muted)}
+  .tabbar button.active{color:var(--accent);border-color:var(--accent);background:rgba(110,168,255,.1)}
+  .pane{display:none}
+  .pane.active{display:block}
+  pre.cfg{background:#0d1526;border:1px solid var(--line);border-radius:10px;padding:16px;overflow:auto;font-size:13px;color:#c8d6f0;line-height:1.65}
+  .small{font-size:12.5px;color:var(--muted)}
+  @media(max-width:760px){.grid,.stats,.mgrid{grid-template-columns:1fr 1fr}.stats{grid-template-columns:repeat(2,1fr)}.demo-body{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<nav><div class="wrap nav-in">
+  <div class="brand">🦌 深思 · <span>DeepResearch</span></div>
+  <div class="nav-links">
+    <button data-t="features">核心功能</button>
+    <button data-t="pipeline">系统架构</button>
+    <button data-t="live">在线演示</button>
+    <button data-t="config">配置指南</button>
+    <button data-t="api">API</button>
+  </div>
+</div></nav>
+
+<header class="hero">
+  <div class="wrap">
+    <span class="pill">基于 LangGraph · 多智能体深度研究 · HITL 人工介入 · RAG 知识库增强</span>
+    <h1>深思 · <em>DeepResearch</em><br>功能在线演示</h1>
+    <p class="sub">无需安装、无需运行后端即可体验完整功能。输入一个研究问题，观看协调器 → 规划器 → 研究团队 → 报告生成的完整研究流水线：联网搜索、网页抓取、评估打分、人工介入、流式报告输出一次性演示。</p>
+    <div class="hero-btns">
+      <button class="btn primary" onclick="scrollTo('live')">▶ 立即体验模拟研究</button>
+      <button class="btn" onclick="scrollTo('pipeline')">查看系统架构</button>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="stats">
+    <div class="stat"><b>6</b><span>研究阶段多智能体</span></div>
+    <div class="stat"><b>10+</b><span>内置 Agent 工具</span></div>
+    <div class="stat"><b>3</b><span>类 HITL 人工介入</span></div>
+    <div class="stat"><b>SSE</b><span>实时流式输出</span></div>
+  </div>
+</div>
+
+<section id="features"><div class="wrap">
+  <h2 class="sec-title">✨ 核心功能全景</h2>
+  <p class="sec-sub">覆盖「规划 → 研究 → 评估 → 报告」的完整深度研究链路，所有能力均可在下方交互演示中触发。</p>
+  <div class="grid">
+    <div class="fcard"><div class="ic">🧠</div><h3>多智能体编排</h3><p>Coordinator → Planner → Research Team（Researcher / Coder / Evaluator）→ Reporter，LangGraph 状态机驱动。</p></div>
+    <div class="fcard"><div class="ic">🔎</div><h3>联网搜索 & 抓取</h3><p>DuckDuckGo（免 Key）/ Tavily 搜索 + Jina / Readability 网页正文抓取，研究者自主选源。</p></div>
+    <div class="fcard"><div class="ic">📚</div><h3>RAG 知识库增强</h3><p>对接 AIHUB，检索 + Rerank 重排，识别目标知识库并注入研究上下文。</p></div>
+    <div class="fcard"><div class="ic">🤝</div><h3>HITL 人工介入</h3><p>计划审核、知识库选择、报告验收三类中断，可接受、修改或重跑。</p></div>
+    <div class="fcard"><div class="ic">🏅</div><h3>评估与反思</h3><p>步骤级评分 + 报告终评，质量不达标自动触发反思循环重新规划。</p></div>
+    <div class="fcard"><div class="ic">⚡</div><h3>SSE 流式输出</h3><p>思考区、工具调用、活动卡片逐事件实时推送，研究过程全程可见。</p></div>
+    <div class="fcard"><div class="ic">🗂️</div><h3>会话管理</h3><p>会话列表 / 回放 / 删除，刷新或重启后可回看历史对话全过程。</p></div>
+    <div class="fcard"><div class="ic">⏭️</div><h3>步骤跳过</h3><p>研究进行中可跳过当前步骤（Skip），流程持续推进不中断。</p></div>
+    <div class="fcard"><div class="ic">🧩</div><h3>MCP 动态工具</h3><p>可选加载 MCP Server，动态扩展 Agent 工具（安全开关默认关闭）。</p></div>
+    <div class="fcard"><div class="ic">📄</div><h3>Word 报告导出</h3><p>研究报告一键导出 .docx，支持中英文编号模板。</p></div>
+    <div class="fcard"><div class="ic">🌐</div><h3>多语言</h3><p>locale 逐层传递，控制输出与内部推理语言（中文 / 英文）。</p></div>
+    <div class="fcard"><div class="ic">📊</div><h3>业务可观测</h3><p>节点事件流水可复盘，无需 LangSmith 也能追踪轨迹，合规友好。</p></div>
+  </div>
+</div></section>
+
+<section id="pipeline"><div class="wrap">
+  <h2 class="sec-title">🧠 系统架构与流水线</h2>
+  <p class="sec-sub">一次深度研究如何被分解、执行、评估与产出 —— 点击阶段名称可在下方在线演示中定位。</p>
+  <div class="pipe">
+    <div class="node" onclick="jumpStep('user')"><span class="tag" style="background:rgba(34,211,238,.15);color:var(--cyan)">输入</span><h4>用户问题</h4><p>研究主题 + 参数</p></div>
+    <div class="arrow">→</div>
+    <div class="node" onclick="jumpStep('coordinator')"><span class="tag" style="background:rgba(110,168,255,.15);color:var(--accent)">协调</span><h4>Coordinator</h4><p>理解问题与场景</p></div>
+    <div class="arrow">→</div>
+    <div class="node" onclick="jumpStep('planner')"><span class="tag" style="background:rgba(157,123,255,.15);color:var(--accent2)">规划</span><h4>Planner</h4><p>生成研究计划</p></div>
+    <div class="arrow">→</div>
+    <div class="node" onclick="jumpStep('hitl1')"><span class="tag" style="background:rgba(251,191,36,.15);color:var(--amber)">人工</span><h4>计划审核</h4><p>HITL 确认/修改</p></div>
+    <div class="arrow">→</div>
+    <div class="node" onclick="jumpStep('research')"><span class="tag" style="background:rgba(52,211,153,.15);color:var(--green)">执行</span><h4>Research Team</h4><p>Researcher · Coder · Eval</p></div>
+    <div class="arrow">→</div>
+    <div class="node" onclick="jumpStep('reporter')"><span class="tag" style="background:rgba(244,114,182,.15);color:#f472b6">产出</span><h4>Reporter</h4><p>6 段式研究报告</p></div>
+    <div class="arrow">→</div>
+    <div class="node" onclick="jumpStep('reportrev')"><span class="tag" style="background:rgba(251,191,36,.15);color:var(--amber)">终评</span><h4>报告验收</h4><p>终评 / 反思循环</p></div>
+    <div class="arrow">→</div>
+    <div class="node" onclick="jumpStep('end')"><span class="tag" style="background:rgba(52,211,153,.25);color:var(--green)">完成</span><h4>报告完成</h4><p>导出/回看/删除</p></div>
+  </div>
+  <p class="small" style="margin-top:14px">💡 点击上方任一节点，可直接跳转至下方【在线演示】对应阶段，观察该节点的运行行为与输出。</p>
+</div></section>
+
+<section id="live"><div class="wrap">
+  <h2 class="sec-title">▶ 在线演示 · 完整研究流水线模拟</h2>
+  <p class="sec-sub">选择一个示例问题（或输入你自己的），点击「开始研究」。系统将自动模拟一次真实研究：流式输出、工具调用、评估打分、HITL 人工介入、反思循环，最终生成规范报告。<b>本演示完全在浏览器本地运行，不依赖后端。</b></p>
+  <div class="demo">
+    <div class="demo-top">
+      <div class="dots"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i></div>
+      <input class="free" id="q" value="对比分析大模型在医疗诊断中的落地挑战与最佳实践" spellcheck="false">
+      <button class="btn primary" id="runBtn" onclick="startRun()">▶ 开始研究</button>
+      <button class="btn" onclick="resetDemo()">↺ 重置</button>
+      <button class="btn" onclick="togglePause()" id="pauseBtn">⏸ 暂停</button>
+    </div>
+    <div class="demo-body">
+      <div class="pipeline-panel" id="pipelineList"></div>
+      <div class="stream-col" id="stream"></div>
+    </div>
+  </div>
+  <p class="small" style="margin-top:10px">🧾 演示中的「思考、搜索、抓取、评分、HITL 中断、报告」均为本地模拟，用于在浏览器内直观展示系统在工作状态下的真实界面形态与交互。</p>
+</div></section>
+
+<section id="config"><div class="wrap">
+  <h2 class="sec-title">⚙️ 配置指南（下载后如何使用）</h2>
+  <p class="sec-sub">本系统通过 <code class="k">.env</code> 与 <code class="k">conf.yaml</code> 完成配置。点击标签查看；克隆仓库后复制示例文件并填写即可运行。</p>
+  <div class="tabbar">
+    <button class="active" data-pane="p-env">后端 .env</button>
+    <button data-pane="p-conf">conf.yaml</button>
+    <button data-pane="p-fe">前端 .env</button>
+    <button data-pane="p-start">快速启动</button>
+  </div>
+  <div class="pane active" id="p-env">
+    <pre class="cfg"># ========== LLM 配置（OpenAI 兼容）==========
+# 环境变量会覆盖 conf.yaml 里的同名字段（BASIC_MODEL__&lt;key&gt; 格式）
+BASIC_MODEL__base_url=http://your-llm-host:port/v1
+BASIC_MODEL__model=Qwen3-32B-FP8
+BASIC_MODEL__api_key=YOUR_API_KEY
+BASIC_MODEL__token_limit=32768      # 上下文上限（缺省则上下文管理失效）
+
+# ========== 搜索引擎 ==========
+SEARCH_API=duckduckgo               # duckduckgo / none
+
+# ========== 开关 ==========
+DEBUG=True
+ENABLE_PYTHON_REPL=true             # Coder Agent 的 Python REPL
+ENABLE_MCP_SERVER_CONFIGURATION=false  # MCP 动态工具（默认关闭）
+
+# ========== PostgreSQL（业务库 + checkpoint 共用）==========
+DATABASE_URL=postgresql+psycopg://postgres:postgres@localhost:5432/postgres
+CHECKPOINT_DB_URL=postgresql://postgres:postgres@localhost:5432/postgres
+
+# ========== AIHUB 知识库（实战可选，凭据勿提交真实值）==========
+AIHUB_API_URL=""
+AIHUB_USERNAME=""
+AIHUB_PASSWORD=""</pre>
+    <p class="small">配置优先级：环境变量 <code class="k">BASIC_MODEL__&lt;key&gt;</code> &gt; <code class="k">conf.yaml</code> &gt; 内置默认值。复制 <code class="k">cp .env.example .env</code> 后按需修改。</p>
+  </div>
+  <div class="pane" id="p-conf">
+    <pre class="cfg"># 复制为 conf.yaml 后使用（优先级低于环境变量，二选一即可）
+BASIC_MODEL:
+  base_url: http://your-llm-host:port/v1
+  model: Qwen3-32B-FP8
+  api_key: "your-api-key"
+  token_limit: 32768        # ContextManager 需要
+  max_retries: 3
+
+# Rerank 重排模型（AIHUB 知识库增强检索用）
+RERANK_MODEL:
+  type: "emb"
+  base_url: "http://your-embedding-host:port/api/emb/embedding"
+  model: ""
+  api_key: ""
+  top_n: 6</pre>
+  </div>
+  <div class="pane" id="p-fe">
+    <pre class="cfg"># 前端 web/.env（由 web/.env.example 复制而来）
+NEXT_PUBLIC_API_URL=http://localhost:8000/api   # 后端 API 代理目标
+GITHUB_OAUTH_TOKEN=                            # 教学版留空</pre>
+  </div>
+  <div class="pane" id="p-start">
+    <table class="tbl">
+      <tr><th>步骤</th><th>命令</th><th>说明</th></tr>
+      <tr><td>克隆</td><td><code class="k">git clone &lt;repo&gt; && cd mini-deepresearch</code></td><td>下载代码</td></tr>
+      <tr><td>复制配置</td><td><code class="k">cp .env.example .env && cp conf.example.yaml conf.yaml</code></td><td>生成本地配置</td></tr>
+      <tr><td>填 LLM</td><td>编辑 <code class="k">.env</code> 的 base_url / model / api_key</td><td>指向 OpenAI 兼容模型服务</td></tr>
+      <tr><td>启动后端</td><td><code class="k">uv run server.py</code></td><td>自动建 venv + 装依赖；默认 8000 端口</td></tr>
+      <tr><td>启动前端</td><td><code class="k">cd web && pnpm install && pnpm dev</code></td><td>访问 http://localhost:3000</td></tr>
+    </table>
+  </div>
+</div></section>
+
+<section id="api"><div class="wrap">
+  <h2 class="sec-title">📡 API 接口速查</h2>
+  <p class="sec-sub">后端 FastAPI 暴露的关键端点（完整说明见 README.md）。</p>
+  <table class="tbl">
+    <tr><th>方法</th><th>路径</th><th>说明</th></tr>
+    <tr><td><code class="k">POST</code></td><td>/api/chat/stream</td><td>聊天流式（SSE 逐事件）</td></tr>
+    <tr><td><code class="k">POST</code></td><td>/api/chat/skip</td><td>跳过当前研究步骤</td></tr>
+    <tr><td><code class="k">GET</code></td><td>/api/conversations</td><td>会话列表</td></tr>
+    <tr><td><code class="k">GET/DELETE</code></td><td>/api/conversation/{id}</td><td>会话回放 / 删除</td></tr>
+    <tr><td><code class="k">POST</code></td><td>/api/graph/report</td><td>导出 Word 报告</td></tr>
+    <tr><td><code class="k">CRUD</code></td><td>/api/config/rag/*</td><td>RAG 知识库配置管理</td></tr>
+    <tr><td><code class="k">POST</code></td><td>/api/config/rag/test_connection</td><td>知识库连接测试（AIHUB 真实连接）</td></tr>
+    <tr><td><code class="k">POST</code></td><td>/api/mcp/server/metadata</td><td>MCP Server 元数据探测</td></tr>
+  </table>
+</div></section>
+
+<div class="wrap footer">
+  深思 · DeepResearch — 基于 LangGraph 的多智能体深度研究系统 · 演示页面可在 <code class="k">docs/feature-demo.html</code> 直接打开（不依赖后端）。<br>
+  © 2026 · 详细安装 / 配置 / 使用见根目录 <b>README.md</b>
+</div>
+
+<script>
+/* ================= 核心状态 ================= */
+var pipelineSteps = [
+  {key:'user',        icon:'👤', label:'用户输入',            desc:'研究主题 + 参数'},
+  {key:'coordinator', icon:'🧭', label:'Coordinator 协调器',  desc:'理解问题与场景'},
+  {key:'planner',     icon:'🗺️', label:'Planner 规划器',      desc:'生成研究计划'},
+  {key:'hitl1',       icon:'🤝', label:'计划审核 (HITL)',     desc:'人工确认/修改'},
+  {key:'research',    icon:'🧪', label:'Research Team 执行',  desc:'Researcher · Coder · Eval'},
+  {key:'reporter',    icon:'📝', label:'Reporter 报告生成',   desc:'6 段式研究报告'},
+  {key:'reportrev',   icon:'🏅', label:'报告终评 · 反思',     desc:'验收 / Reflect'},
+  {key:'end',         icon:'✅', label:'完成 & 导出',         desc:'回看 / Word 导出'},
+];
+var stepOrder = pipelineSteps.map(function(s){return s.key;});
+var pause=false, runActive=false, curStep=null;
+var wait = function(ms){ return new Promise(function(r){ setTimeout(r, ms); }); };
+
+function renderPipeline(){
+  var list=document.getElementById('pipelineList');
+  list.innerHTML = pipelineSteps.map(function(s){
+    return '<div class="pstep" data-step="'+s.key+'"><span class="dot">'+s.icon+'</span><div><div>'+s.label+'</div><div class="small">'+s.desc+'</div></div></div>';
+  }).join('');
+}
+
+/* 高亮流水线：on=当前，done=此前已完成 */
+function setStep(k){
+  curStep=k;
+  var idx=stepOrder.indexOf(k);
+  document.querySelectorAll('.pstep').forEach(function(n){
+    var i=stepOrder.indexOf(n.dataset.step);
+    n.classList.toggle('on', n.dataset.step===k);
+    n.classList.toggle('done', i>-1 && idx>-1 && i<idx);
+  });
+  var p=document.querySelector('.pstep[data-step="'+k+'"]');
+  if(p) p.scrollIntoView({block:'nearest'});
+}
+/* 等待，且尊重暂停 */
+async function keep(){
+  while(runActive){
+    if(pause){ await wait(60); continue; }
+    return;
+  }
+}
+async function settle(ms){
+  await keep();
+  var t=Date.now();
+  while(Date.now()-t < ms){ await wait(20); await keep(); }
+}
+
+/* 工具：typewriter（渲染纯文本安全，保持光标） */
+function cursorOn(active){ return active ? '<span class="cursor"></span>' : ''; }
+function escHtml(t){ return (t||'').replace(/[<>&]/g,function(m){ return {'<':'&lt;','>':'&gt;','&':'&amp;'}[m]; }); }
+function addCard(cardClass){
+  var d=document.createElement('div');
+  d.className='card'+(cardClass?' '+cardClass:'');
+  document.getElementById('stream').appendChild(d);
+  autoScroll();
+  return d;
+}
+function autoScroll(){ var s=document.getElementById('stream'); s.scrollTop=s.scrollHeight; }
+function badge(txt,color){ return '<span class="badge"'+(color?(' style="color:'+color+'"'):'')+'>'+txt+'</span>'; }
+function whoHtml(icon,name,noteHtml,activity){ 
+  return '<div class="hd"><span style="font-size:16px">'+icon+'</span><span class="who">'+name+'</span>'+(activity?badge(activity):'')+(noteHtml||'')+'</div>';
+}
+function addText(node, text, plain){
+  return new Promise(function(res){
+    var i=0, len=text.length;
+    (function tick(){
+      node.classList.add('streaming');
+      node.innerHTML = escHtml(text.slice(0,i)) + cursorOn(true);
+      autoScroll();
+      if(i>=len){ node.classList.remove('streaming'); node.innerHTML=escHtml(text)+cursorOn(false); res(); return; }
+      i++;
+      var gap = i>=len? 10 : 10;
+      setTimeout(function(){ Promise.resolve().then(function(){ return settle(1); }).then(tick); }, gap);
+    })();
+  });
+}
+/* 在指定容器追加一段正文并打字 */
+function appendTypeBox(card, firstText){
+  var box=document.createElement('div');
+  box.style.cssText='padding:8px 0 4px;color:var(--txt);font-size:13.5px;white-space:pre-wrap;';
+  card.appendChild(box);
+  if(firstText){ return addText(box, firstText); }
+  return Promise.resolve(box);
+}
+function appendButtons(card, btns){
+  var w=document.createElement('div'); w.className='hl-options';
+  w.innerHTML = btns.map(function(b){ var lb=(typeof b==='string')? b : b.t; return '<button class="optbtn">'+lb+'</button>'; }).join('');
+  card.appendChild(w);
+  return w;
+}
+function disableOthers(btn){
+  var parent=btn.parentNode;
+  [...parent.children].forEach(function(b){ if(b!==btn){ b.style.opacity=.4; b.style.pointerEvents='none'; } });
+  btn.style.background='var(--green)'; btn.style.color='#033b'; btn.style.borderColor='var(--green)';
+}
+
+/* ================= 问题库 ================= */
+var QUESTIONS=[
+  {key:'对比分析大模型在医疗诊断中的落地挑战与最佳实践', topic:'大模型医疗诊断落地'},
+  {key:'2026年新能源行业的投资机会分析', topic:'新能源行业投资机会'},
+];
+function topicOf(q){
+  for(var i=0;i<QUESTIONS.length;i++){ if(QUESTIONS[i].key===q) return QUESTIONS[i].topic; }
+  return q;
+}
+
+/* ================= 主流程 ================= */
+async function startRun(){
+  if(runActive) return;
+  runActive=true; pause=false;
+  document.getElementById('runBtn').disabled=true;
+  document.getElementById('stream').innerHTML='';
+  renderPipeline();
+  var q=document.getElementById('q').value.trim()||QUESTIONS[0].key;
+  var topic=topicOf(q);
+  setStep('user');
+  await userMessage(q);
+  await phase('coordinator', function(){ return coordinator(topic); });
+  await phase('planner', function(){ return planner(topic); });
+  await phase('hitl1', function(){ return hitlReview(topic); });
+  await phase('research', function(){ return researchTeam(topic); });
+  await phase('reporter', function(){ return reporterStep(topic); });
+  await phase('reportrev', function(){ return reflectionStep(topic); });
+  await finalReport(topic);
+  setStep('end');
+  document.getElementById('runBtn').disabled=false;
+}
+async function phase(key, fn){
+  setStep(key);
+  await fn();
+}
+async function userMessage(q){
+  var c=addCard();
+  c.innerHTML = whoHtml('👤','你','') + '<div><b style="font-size:14px">'+escHtml(q)+'</b></div>';
+  await settle(420);
+}
+async function coordinator(topic){
+  var c=addCard();
+  c.innerHTML = whoHtml('🧭','Coordinator 协调器','', '识别知识库 · 理解问题');
+  await appendTypeBox(c, '「'+topic+'」涉及多来源信息交叉验证。我将拆解为「背景综述、技术挑战、最佳实践、落地建议」四个层面，优先采用联网搜索 + RAG 知识库增强检索，确保结论有据可循。');
+  var r=document.createElement('div'); r.className='toolchips';
+  r.innerHTML='<span class="tc">📚 识别知识库：发现可增强来源「AIHUB · 领域文献」</span>';
+  c.appendChild(r);
+  await settle(320);
+}
+async function planner(topic){
+  var c=addCard();
+  c.innerHTML = whoHtml('🗺️','Planner 规划器','', '生成研究计划 · 5 步骤');
+  var box=document.createElement('div'); box.className='answer'; c.appendChild(box);
+  await addText(box, '📍 研究计划（5 步）\n1. 背景与市场规模综述（信息收集）\n2. 技术难点与数据挑战（信息收集）\n3. 公开数据集与评测（数据统计）\n4. 合规与可解释性（信息收集）\n5. 落地最佳实践与建议（数据统计）');
+  var btns=appendButtons(c,[{t:'✏️ 修改计划'},{t:'✓ 接受，开始研究'}]);
+  await bindPlanButtons(btns);
+  await settle(260);
+}
+function bindPlanButtons(w){
+  var btns=[].slice.call(w.children);
+  btns.forEach(function(b){ b.addEventListener('click', function(){ disableOthers(b); }); });
+  return Promise.resolve();
+}
+async function hitlReview(topic){
+  var c=addCard();
+  c.innerHTML = whoHtml('🤝','系统 · HITL 计划审核中断','', '等待人工确认');
+  await appendTypeBox(c, '📋 已根据你的问题生成研究计划，请审阅。可「开始研究」直接执行，或「修改计划」让规划器根据你的建议重新规划。');
+  var btns=appendButtons(c,[{t:'✓ 开始研究'},{t:'✏️ 修改计划'},{t:'⏭️ 跳过本步骤'}]);
+  [].slice.call(btns.children).forEach(function(b){ b.addEventListener('click', function(){ disableOthers(b); }); });
+  await settle(260);
+}
+async function researchTeam(topic){
+  var tasks=[
+    {agent:'Researcher 研究员', icon:'🔍', activity:'执行研究 · 联网搜索 / 抓取',
+     think:'「'+topic+'」需要量化市场规模与增速，先检索权威行业综述与近期文献。',
+     tool:'duckduckgo_search + web.extract', query:topic+' 市场综述 2026',
+     cards:[
+       {t:'权威医改白皮书：大模型医疗进入规模化应用期', s:'白皮书 · 医疗智库', d:'预计 2026-2030 医疗大模型市场复合增速超 40%，诊断辅助与病历质控落地最快。'},
+       {t:'多中心 RAG 诊断系统实测：敏感度提升 12%', s:'《JAMA · AI》', d:'引入多源知识库增强后，在识别罕见病与复杂合并症上表现明显更优。'}
+     ]},
+    {agent:'Researcher 研究员', icon:'🔍', activity:'网页抓取 · 清洗正文',
+     think:'对高相关链接做正文抓取，去噪并统一格式，保留可引用的核心数据。',
+     tool:'readability_extract', query:'',
+     cards:[
+       {t:'web.extract · 白皮书', s:'', d:'从页面提取 2843 字，移除导航与广告噪声，转统一 Markdown。'},
+       {t:'web.extract · JAMA', s:'', d:'从页面提取 1920 字，标注来源与日期，保留统计口径。'}
+     ]},
+    {agent:'Coder 程序员', icon:'👨‍💻', activity:'数据统计 · Python REPL',
+     think:'对多来源提及的挑战做频次统计，便于报告聚焦高风险项。',
+     tool:'python_repl', query:'',
+     code:"# 各来源 2026 提及挑战频次\ndata={'数据质量':8,'医生信任':7,'合规':9,'可解释性':6,'成本':5}\ntop=sorted(data.items(), key=lambda x:-x[1])\nprint(top)  # 合规 > 数据质量 > 医生信任"},
+    {agent:'Evaluator 评估器', icon:'🏅', activity:'评估研究结果 · 步骤打分',
+     think:'逐条对照计划核对信息完整性、来源质量与相关性，给出可执行改进建议。',
+     tool:'eval', query:'', score:88, feedback:'结构完整、引用充分；建议补充医疗结构落地成本的具体测算口径。'}
+  ];
+  for(var i=0;i<tasks.length;i++){ await researchTask(tasks[i]); setStep('research'); }
+}
+function researchTask(t){
+  return new Promise(function(res){
+    var c=addCard();
+    c.innerHTML = whoHtml(t.icon,t.agent,'',t.activity);
+    var th=document.createElement('div'); th.className='toolchips';
+    th.innerHTML='<span class="tc">💭 思考</span>'; c.appendChild(th);
+    var thinkBox=document.createElement('div');
+    thinkBox.style.cssText='margin-top:8px;color:var(--muted);font-size:13px;border-left:2px solid var(--accent);padding-left:10px;white-space:pre-wrap';
+    c.appendChild(thinkBox);
+    addText(thinkBox, t.think).then(function(){
+      var tc=document.createElement('div'); tc.className='toolchips';
+      tc.innerHTML='<span class="tc">🧰 调用 <b>'+t.tool+'</b></span>'+(t.query?'<span class="tc">🔎 '+t.query+'</span>':'');
+      c.appendChild(tc);
+      (t.cards||[]).forEach(function(cd){
+        var cc=document.createElement('div'); cc.className='card';
+        cc.style.cssText='margin-top:10px;background:var(--card);font-size:12.5px';
+        cc.innerHTML='<div style="color:var(--accent);font-weight:600">'+cd.t+'</div>'+(cd.s?'<div class="small">'+cd.s+'</div>':'')+'<div style="color:var(--muted);margin-top:3px">'+cd.d+'</div>';
+        c.appendChild(cc);
+      });
+      if(t.code){ var code=document.createElement('div'); code.className='card'; code.style.cssText='margin-top:10px;background:#0d1526;font-size:12.5px';
+        code.innerHTML='<b style="color:#9d7bff">⌨️ 代码执行</b><pre style="margin-top:6px">'+t.code+'</pre>'; c.appendChild(code); }
+      if(t.score){
+        var sc=document.createElement('div'); sc.className='card'; sc.style.cssText='margin-top:10px';
+        sc.innerHTML='<b>🏅 步骤评分</b> <span style="color:var(--green)">'+t.score+' 分</span><div class="scorebar"><i style="width:0%"></i></div><div class="small" style="margin-top:6px">'+t.feedback+'</div>';
+        c.appendChild(sc);
+        requestAnimationFrame(function(){ setTimeout(function(){ sc.querySelector('.scorebar i').style.width=Math.min(92,t.score+4)+'%'; },60); });
+      }
+      settle(320).then(res);
+    });
+  });
+}
+async function reporterStep(topic){
+  var c=addCard();
+  c.innerHTML = whoHtml('📝','Reporter 报告生成器','', '研究结果 → 规范报告');
+  await appendTypeBox(c, '🧠 思考：汇总研究结果，去重去噪，按「标题 / 摘要 / 背景 / 分析 / 建议 / 参考」组织，并挂接关键引用来源。');
+  var card=document.createElement('div'); card.className='card'; card.style.marginTop='10px'; card.style.background='var(--card)';
+  card.innerHTML='<div class="hd"><span style="font-size:16px">📄</span><span class="who">最终研究报告</span><span class="badge" style="background:rgba(52,211,153,.14);color:var(--green)">Markdown · 6 段式</span></div>';
+  c.appendChild(card);
+  await settle(300);
+}
+async function reflectionStep(topic){
+  var c=addCard();
+  c.innerHTML = whoHtml('🏅','Final Evaluator 报告终评','', '评估报告质量 · Reflection');
+  await appendTypeBox(c, '📊 报告终评：完整性 92 · 引用充分 90 · 结构 96 · 可操作性 88 → 综合 91 / 100  ✔ 达标，无需触发反思循环。');
+  var btns=appendButtons(c,[{t:'✓ 接受报告'},{t:'↻ 重新生成'},{t:'📥 导出 Word（下载实例）'}]);
+  [].slice.call(btns.children).forEach(function(b){ b.addEventListener('click',function(){ disableOthers(b); if(/导出/.test(b.textContent)){ downloadReport(); } }); });
+  await settle(200);
+}
+async function finalReport(topic){
+  var block=document.createElement('div'); block.className='answer';
+  block.innerHTML = finalReportHtml(topic);
+  document.getElementById('stream').appendChild(block); autoScroll();
+  var ct=document.getElementById('stream').childElementCount;
+  var done=addCard();
+  done.innerHTML = whoHtml('🎉','研究完成','') + '<div class="hl-options"><button class="optbtn">✓ 回放本会话</button><button class="optbtn" onclick="resetDemo()">↺ 开始新的研究</button></div>';
+  await settle(220);
+}
+function finalReportHtml(topic){
+  return '<h5>摘要</h5><blockquote class="good">针对「'+topic+'」的深度研究已完成。共执行 5 个研究步骤、检索 12 个来源、完成 2 项数据统计，报告综合评分达标。关键结论：合规是首要落地挑战，RAG 知识库增强可显著提升诊断敏感度。</blockquote>'
+  +'<h5>1. 背景</h5><p style="color:var(--txt)">大模型逐步进入医疗诊断辅助场景，数据质量、医生信任、合规与可解释性构成主要落地障碍。</p>'
+  +'<h5>2. 核心分析</h5><table class="tbl"><tr><th>来源</th><th>关键发现</th><th>置信</th></tr>'
+  +'<tr><td>医疗智库白皮书</td><td>2026-2030 复合增速超 40%</td><td>高</td></tr>'
+  +'<tr><td>JAMA · AI</td><td>多中心 RAG 敏感度提升 12%</td><td>高</td></tr>'
+  +'<tr><td>行业访谈</td><td>合规 / 可解释性为最大痛点</td><td>中</td></tr></table>'
+  +'<h5>3. 结论与建议</h5><ol><li>优先建设高质量、多中心的标准数据集，应对数据质量挑战。</li><li>通过 RAG 知识库增强 + 可解释性展示提升医生信任。</li><li>尽早共建合规评估框架，作为医疗落地的硬性前提。</li></ol>'
+  +'<h5>参考</h5><ul><li>医疗智库 · 白皮书 2026</li><li>JAMA · AI 多中心研究</li><li>行业访谈纪要（脱敏）</li></ul>';
+}
+function downloadReport(){
+  var txt='# 大模型医疗诊断落地研究报告（Demo 导出）\n\n## 摘要\n- 综合多源信息，合规为主要挑战。\n- RAG 增强可提升敏感度。\n';
+  var a=document.createElement('a');
+  a.download='research-report-demo.md';
+  a.href=URL.createObjectURL(new Blob([txt],{type:'text/markdown'}));
+  a.click();
+}
+/* ================= 控制 ================= */
+function togglePause(){
+  if(!runActive) return;
+  pause=!pause;
+  document.getElementById('pauseBtn').textContent = pause ? '▶ 继续' : '⏸ 暂停';
+}
+function resetDemo(){
+  runActive=false; pause=false; curStep=null;
+  document.getElementById('stream').innerHTML='';
+  renderPipeline();
+  document.getElementById('q').value=QUESTIONS[0].key;
+  document.getElementById('runBtn').disabled=false;
+}
+function jumpStep(k){ scrollTo('live'); startRun(); }
+function scrollTo(id){ var s=document.getElementById(id); if(s){ scrollTo2(s); } }
+function scrollTo2(s){ s.scrollIntoView({behavior:'smooth'}); }
+
+/* ================= 导航 / 标签 ================= */
+function scrollSpy(){
+  var ids=['features','pipeline','live','config','api'];
+  var best=null,bestY=-99999;
+  ids.forEach(function(id){
+    var el=document.getElementById(id); if(!el)return;
+    var y=el.getBoundingClientRect().top;
+    if(y-120<0 && y>bestY){ bestY=y; best=id; }
+  });
+  if(!best && bestY==-99999){ best='features'; }
+  [].slice.call(document.querySelectorAll('.nav-links button')).forEach(function(b){
+    b.classList.toggle('active', b.dataset.t===best);
+  });
+}
+document.addEventListener('scroll', scrollSpy);
+[].slice.call(document.querySelectorAll('.nav-links button')).forEach(function(b){
+  b.addEventListener('click', function(){ scrollTo(b.dataset.t); });
+});
+[].slice.call(document.querySelectorAll('.tabbar button')).forEach(function(b){
+  b.addEventListener('click', function(){
+    [].slice.call(document.querySelectorAll('.tabbar button')).forEach(function(x){ x.classList.remove('active'); });
+    b.classList.add('active');
+    [].slice.call(document.querySelectorAll('.pane')).forEach(function(p){ p.classList.remove('active'); });
+    document.getElementById(b.dataset.pane).classList.add('active');
+  });
+});
+renderPipeline();
+scrollSpy();
+</script>
+</body>
+</html>

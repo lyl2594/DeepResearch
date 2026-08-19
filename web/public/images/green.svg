@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="56px" height="54px" viewBox="0 0 56 54" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>编组 13</title>
+    <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="5" transform="translate(-1585, -528)">
+            <g id="编组-4" transform="translate(815, 40)">
+                <g id="编组-26" transform="translate(52, 488)">
+                    <g id="编组-13" transform="translate(718, 0)">
+                        <path d="M0,0 L50,0 L50,48.9808066 C50,50.6376608 48.6568542,51.9808066 47,51.9808066 C46.5041484,51.9808066 46.0160283,51.8579003 45.5793028,51.623082 L26.4206972,41.3218937 C25.5336146,40.8449276 24.4663854,40.8449276 23.5793028,41.3218937 L4.42069718,51.623082 C2.96140875,52.4077114 1.14235394,51.8607922 0.357724557,50.4015038 C0.12290624,49.9647783 -1.28259692e-15,49.4766582 -2.66453526e-15,48.9808066 L0,0 L0,0 Z" id="矩形" fill="#DBF5E8"></path>
+                        <g id="路径-15" transform="translate(50, 0)" fill="#ACD2BF">
+                            <polygon id="路径-5" points="0 0 6 5 0 5"></polygon>
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
